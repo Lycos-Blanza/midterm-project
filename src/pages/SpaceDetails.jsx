@@ -1,5 +1,5 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { SPACES } from "../data/spaces.js";
+import SPACES from "../data/spaces.json";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBookings } from "../contexts/BookingContext.jsx";
 import { useState, useMemo } from "react";
@@ -7,20 +7,23 @@ import SpaceDetailCard from "../components/SpaceDetailsCard.jsx";
 import BookingForm from "../components/BookingForm.jsx";
 
 export default function SpaceDetail() {
-  const { spaceId } = useParams();
+  const { spaceId } = useParams(); // get spaceId from route
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addBooking } = useBookings();
 
+  // Find the space by ID (memoized for performance)
   const space = useMemo(
     () => SPACES.find((s) => s.id === String(spaceId)),
     [spaceId]
   );
 
+  // Form state
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [dateError, setDateError] = useState("");
 
+  // Helper to format Date object to YYYY-MM-DD string
   function getLocalDateString(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -28,15 +31,20 @@ export default function SpaceDetail() {
     return `${year}-${month}-${day}`;
   }
 
+  // Minimum date allowed is today
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const minDate = getLocalDateString(today);
 
-  if (!space) return <p>Space not found.</p>;
+  if (!space) return <p>Space not found.</p>; // fallback if space ID invalid
 
   const location = useLocation();
+
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Redirect to login if not authenticated
     if (!user) {
       navigate("/login", { state: { from: `/space/${spaceId}` } });
       return;
@@ -57,8 +65,7 @@ export default function SpaceDetail() {
     navigate("/dashboard/my-bookings");
   };
 
-  // ... (keep your parseTimeTo24, slotEndIsPastInManila, chosenDateIsTodayInManila as-is)
-
+  // Convert 12-hour format string (e.g., "2:30 PM") to 24-hour {h, m} object
   const parseTimeTo24 = (t) => {
     if (!t) return null;
     const m = t
@@ -74,6 +81,7 @@ export default function SpaceDetail() {
     return { h: hh, m: mm };
   };
 
+  // Check if the end of the selected time slot is already past in Manila time
   const slotEndIsPastInManila = (dateStr, slot) => {
     if (!dateStr) return false;
     const parts = slot.split(/\s*-\s*/);
@@ -89,6 +97,8 @@ export default function SpaceDetail() {
     const startMatch = startPart.match(/(\d{1,2}(?::\d{2})?\s*(am|pm))/i);
     const startTime = startMatch ? parseTimeTo24(startMatch[0]) : null;
     let endDayOffset = 0;
+
+    // If slot ends before it starts, treat it as next day
     if (startTime && endTime) {
       if (
         endTime.h < startTime.h ||
@@ -103,7 +113,7 @@ export default function SpaceDetail() {
       y,
       m - 1,
       d + endDayOffset,
-      endTime.h - 8,
+      endTime.h - 8, // Manila is UTC+8
       endTime.m,
       0
     );
@@ -112,6 +122,7 @@ export default function SpaceDetail() {
     return slotEndUTCms <= nowUTCms;
   };
 
+  // Check if the chosen date is today in Manila timezone
   const chosenDateIsTodayInManila = (() => {
     if (!date) return false;
     const nowManila = new Date(

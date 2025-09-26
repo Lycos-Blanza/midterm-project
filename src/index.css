@@ -3,7 +3,19 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root { height: 100%; }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+}
+
+html {
+  overflow-y: scroll; /* Always reserve space for scrollbar */
+}
+
+.fixed {
+  margin: 0 !important;
 }
 
 @layer components {

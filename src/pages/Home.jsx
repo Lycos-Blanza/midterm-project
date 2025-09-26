@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
-import { SPACES } from '../data/spaces.js'
+import SPACES from '../data/spaces.json'
 import SearchBar from '../components/SearchBar.jsx'
 import SpaceCard from '../components/SpaceCard.jsx'
 
 export default function Home() {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState('') // search input state
 
+  // Filter spaces based on search query (name or location)
+  // useMemo ensures filtering runs only when query changes
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return SPACES
+    const q = query.trim().toLowerCase() // normalize query
+    if (!q) return SPACES // return all spaces if query is empty
     return SPACES.filter(s =>
       s.name.toLowerCase().includes(q) || s.location.toLowerCase().includes(q)
     )

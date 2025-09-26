@@ -7,10 +7,11 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
 import { BookingProvider } from "./contexts/BookingContext.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
+// Main app content wrapped with auth context
 function AppContent() {
-  const { loading } = useAuth();
+  const { loading } = useAuth(); // get loading state from auth
 
-  // ✅ While restoring auth state, show a loading spinner/message
+  // Show loading screen while restoring auth state
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -44,6 +45,7 @@ function AppContent() {
   );
 }
 
+// Wrap the app with auth and booking providers for context
 export default function App() {
   return (
     <AuthProvider>

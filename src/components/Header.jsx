@@ -2,14 +2,14 @@ import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 export default function Header() {
-  const { user, login, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user, login, logout } = useAuth(); // get auth state and functions
+  const navigate = useNavigate(); // navigate programmatically
+  const location = useLocation(); // current route info
 
   const handleLogout = () => {
-    logout();
+    logout(); // log the user out
 
-    // If currently on My Bookings, redirect to Home
+    // If currently on My Bookings page, redirect to Home
     if (location.pathname === "/dashboard/my-bookings") {
       navigate("/", { replace: true });
     }

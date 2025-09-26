@@ -2,27 +2,28 @@ import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
+// Provides authentication state and functions to the app
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null); // holds the current logged-in user
+  const [loading, setLoading] = useState(true); // tracks if auth state is being loaded
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("user"); // check for saved user in localStorage
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser)); // restore user if found
     }
-    setLoading(false);
+    setLoading(false); // done checking/loading auth state
   }, []);
 
   const login = (name) => {
     const newUser = { name };
-    setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
+    setUser(newUser); // update user state
+    localStorage.setItem("user", JSON.stringify(newUser)); // save user to localStorage for persistence
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+    setUser(null); // clear user state
+    localStorage.removeItem("user"); // remove user from localStorage
   };
 
   return (
@@ -32,6 +33,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// Custom hook for easy access to authentication context
 export function useAuth() {
   return useContext(AuthContext);
 }
