@@ -1,21 +1,37 @@
-import { createContext, useContext } from 'react'
-import useLocalStorage from '../hooks/useLocalStorage'
+import { createContext, useContext, useState, useEffect } from "react";
 
-const AuthContext = createContext(null)
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useLocalStorage('ssph_user', null)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (name = 'Student User') => setUser({ name })
-  const logout = () => setUser(null)
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (name) => {
+    const newUser = { name };
+    setUser(newUser);
+    localStorage.setItem("user", JSON.stringify(newUser));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  return useContext(AuthContext)
+  return useContext(AuthContext);
 }

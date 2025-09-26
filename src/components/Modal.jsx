@@ -13,7 +13,7 @@ export default function Modal({
         {description && <p className="text-sm text-davy mt-2">{description}</p>}
         <div className="mt-6 flex justify-end gap-3">
           <button className="btn-secondary" onClick={onCancel}>
-            Cancel
+            Keep Booking
           </button>
           <button className="btn-primary" onClick={onConfirm}>
             Confirm
